@@ -1,0 +1,6 @@
+{
+    "http": {
+        "listenAddress": ":8080",
+        "keepAlive": true
+    }
+}
