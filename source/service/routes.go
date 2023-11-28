@@ -2,45 +2,45 @@ package service
 
 import (
 	"fmt"
-	"gogogo/data"
+	"gogogo/data/contract"
 	"gogogo/log"
 	"gogogo/requests"
 	"strings"
 )
 
-func AddPublicPull(path string, handler requests.Handler, contract *data.Contract) {
+func AddPublicPull(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Pull, path, true, handler, contract)
 }
 
-func AddPublicPush(path string, handler requests.Handler, contract *data.Contract) {
+func AddPublicPush(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Push, path, true, handler, contract)
 
 }
 
-func AddPublicUpdate(path string, handler requests.Handler, contract *data.Contract) {
+func AddPublicUpdate(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Update, path, true, handler, contract)
 
 }
 
-func AddPublicDelete(path string, handler requests.Handler, contract *data.Contract) {
+func AddPublicDelete(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Delete, path, true, handler, contract)
 
 }
 
-func AddPrivatePull(path string, handler requests.Handler, contract *data.Contract) {
+func AddPrivatePull(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Pull, path, false, handler, contract)
 
 }
 
-func AddPrivatePush(path string, handler requests.Handler, contract *data.Contract) {
+func AddPrivatePush(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Push, path, false, handler, contract)
 }
 
-func AddPrivateUpdate(path string, handler requests.Handler, contract *data.Contract) {
+func AddPrivateUpdate(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Update, path, false, handler, contract)
 }
 
-func AddPrivateDelete(path string, handler requests.Handler, contract *data.Contract) {
+func AddPrivateDelete(path string, handler requests.Handler, contract *contract.Contract) {
 	addRoute(requests.Delete, path, false, handler, contract)
 }
 
@@ -54,7 +54,7 @@ type routeInfo struct {
 	isPublic    bool
 	handler     requests.Handler
 	parts       []routePartInfo
-	contract    *data.Contract
+	contract    *contract.Contract
 }
 
 var (
@@ -101,7 +101,7 @@ func findRoute(requestType requests.Type, path string) *routeInfo {
 	return nil
 }
 
-func addRoute(requestType requests.Type, path string, isPublic bool, handler requests.Handler, contract *data.Contract) {
+func addRoute(requestType requests.Type, path string, isPublic bool, handler requests.Handler, contract *contract.Contract) {
 	log.Verbose(_logTag, "adding route for %s:%s", strings.ToLower(requestType.String()), path)
 
 	if existingRoute := findRoute(requestType, path); existingRoute != nil {

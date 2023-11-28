@@ -7,7 +7,7 @@ type BroadcastLogger struct {
 	targets  []Logger
 }
 
-func Broadcast(targets []Logger) *BroadcastLogger {
+func Broadcast(targets ...Logger) *BroadcastLogger {
 	var logger = BroadcastLogger{
 		maxLevel: ErrorLevel,
 		targets:  make([]Logger, 0),

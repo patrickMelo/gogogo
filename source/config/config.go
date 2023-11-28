@@ -10,7 +10,7 @@ type Provider interface {
 	Load() (data.GenericMap, error)
 }
 
-func Load(providers []Provider) (err error) {
+func Load(providers ...Provider) (err error) {
 	var providerParams data.GenericMap
 	var allParams = data.NewGenericMap()
 

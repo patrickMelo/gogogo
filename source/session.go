@@ -1,20 +1,16 @@
 package main
 
 import (
-	"gogogo/data"
+	"gogogo/data/contract"
 	"gogogo/requests"
 
 	"github.com/google/uuid"
 )
 
-var sessionLoginContract = data.NewContract([]data.ContractField{
-	data.ContractString("username").Length(1, 128).Required(),
-	data.ContractString("password").Length(8, 128).Required(),
-})
-
-func GetSessionLoginContract() *data.Contract {
-	return sessionLoginContract
-}
+var SessionLoginContract = contract.New(
+	contract.String("username").Length(1, 128).Required(),
+	contract.String("password").Length(8, 128).Required(),
+)
 
 type SessionLoginData struct {
 	SessionId string `key:"sessionId"`

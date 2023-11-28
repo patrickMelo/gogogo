@@ -28,14 +28,12 @@ func Http() *HttpListener {
 	return &HttpListener{}
 }
 
-func (listener *HttpListener) Start(handler requests.Handler) (err error) {
+func (listener *HttpListener) Start() (err error) {
 	var keepAlive = config.GetBool("http.keepAlive", false)
 
 	listener.server.Addr = config.GetString("http.listenAddress", ":80")
 	listener.server.SetKeepAlivesEnabled(keepAlive)
-	listener.server.Handler = &httpHandler{
-		requestsHandler: handler,
-	}
+	listener.server.Handler = &httpHandler{}
 
 	log.Verbose(httpLogTag, "listen address = %s", listener.server.Addr)
 	log.Verbose(httpLogTag, "keep alive = %v", keepAlive)
@@ -67,8 +65,6 @@ const (
 
 type httpHandler struct {
 	http.Handler
-
-	requestsHandler requests.Handler
 }
 
 func (handler *httpHandler) ServeHTTP(httpResponse http.ResponseWriter, httpRequest *http.Request) {
@@ -121,7 +117,7 @@ func (handler *httpHandler) ServeHTTP(httpResponse http.ResponseWriter, httpRequ
 	}
 
 	var response = requests.NewResponse(request.Id)
-	var requestError = handler.requestsHandler(request, response)
+	var requestError = service.HandleRequest(request, response)
 
 	if requestError != nil {
 		writeError(http.StatusInternalServerError, requestError)
@@ -158,7 +154,7 @@ func parseHeader(request *requests.Request, header http.Header) (int, error) {
 			return http.StatusBadRequest, fmt.Errorf("bad authorization token data: %s", tokenData)
 		}
 
-		request.Metadata.Set("Token", splitData[1])
+		request.Metadata.Set("token", splitData[1])
 	}
 
 	return http.StatusOK, nil

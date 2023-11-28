@@ -1,7 +1,6 @@
 package service
 
 import (
-	"gogogo/data"
 	"gogogo/log"
 	"gogogo/requests"
 	"os"
@@ -11,12 +10,12 @@ import (
 )
 
 type Listener interface {
-	Start(handler requests.Handler) error
+	Start() error
 	Stop()
 }
 
 // Initializes the service infrastructure.
-func Start(name string, versionString string, listeners []Listener) {
+func Start(name string, versionString string, listeners ...Listener) {
 	log.Information(_logTag, "%s - version %s", name, versionString)
 	_listeners = listeners
 }
@@ -26,7 +25,7 @@ func Run() (err error) {
 	defer log.Information(_logTag, "stopped")
 
 	for _, listener := range _listeners {
-		if err = listener.Start(handleRequest); err != nil {
+		if err = listener.Start(); err != nil {
 			stopListeners()
 			return
 		}
@@ -53,7 +52,7 @@ func Stop() {
 	_isRunning = false
 }
 
-func handleRequest(request *requests.Request, response *requests.Response) error {
+func HandleRequest(request *requests.Request, response *requests.Response) error {
 	log.Information(_logTag, "(%s) %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
 
 	log.Verbose(_logTag, "(%s) searching route for %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
@@ -80,7 +79,7 @@ func handleRequest(request *requests.Request, response *requests.Response) error
 			log.Verbose(_logTag, "(%s) payload has contract validation errors: %v", request.Id, contractErrors)
 
 			response.Status = requests.InvalidData
-			response.Data[data.ContractValidationErrorsFieldName] = contractErrors
+			response.Data["errors"] = contractErrors
 
 			return nil
 		}
