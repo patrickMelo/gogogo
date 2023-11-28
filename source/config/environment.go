@@ -28,7 +28,7 @@ func (provider *EnvironmentProvider) Load() (params data.GenericMap, err error) 
 	for _, envVar := range os.Environ() {
 		varData = strings.SplitN(envVar, "=", 2)
 
-		if strings.Index(varData[0], provider.prefix) == 0 {
+		if strings.HasPrefix(varData[0], provider.prefix) {
 			key = strings.ToLower(strings.ReplaceAll(varData[0], "_", "."))[prefixLength:]
 			params.Set(key, varData[1])
 		}

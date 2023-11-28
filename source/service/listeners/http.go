@@ -137,7 +137,9 @@ func (handler *httpHandler) ServeHTTP(httpResponse http.ResponseWriter, httpRequ
 func parseHeader(request *requests.Request, header http.Header) (int, error) {
 	var contentType = header.Get("Content-Type")
 
-	log.Verbose(httpLogTag, "(%s) content type: %s", request.Id, contentType)
+	if contentType != "" {
+		log.Verbose(httpLogTag, "(%s) content type: %s", request.Id, contentType)
+	}
 
 	if ((request.Type == requests.Push) || (request.Type == requests.Update)) && contentType != "application/json" {
 		return http.StatusUnsupportedMediaType, fmt.Errorf("unsupported content-type: \"%s\"", contentType)

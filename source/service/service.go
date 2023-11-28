@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"runtime"
 	"strings"
+	"time"
 )
 
 type Listener interface {
@@ -39,6 +40,7 @@ func Run() (err error) {
 
 	for _isRunning {
 		runtime.Gosched()
+		time.Sleep(time.Millisecond * 100)
 	}
 
 	close(_signalChannel)
@@ -55,16 +57,15 @@ func Stop() {
 func HandleRequest(request *requests.Request, response *requests.Response) error {
 	log.Information(_logTag, "(%s) %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
 
-	log.Verbose(_logTag, "(%s) searching route for %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
-
 	var route = findRoute(request.Type, request.Path)
 
 	if route == nil {
+		log.Warning(_logTag, "(%s) route not found for %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
 		response.Status = requests.ResourceNotFound
 		return nil
 	}
 
-	log.Verbose(_logTag, "(%s) route found for %s:%s", request.Id, strings.ToLower(request.Type.String()), request.Path)
+	request.Data.MergeWith(extractRouteData(route, request.Path))
 
 	if !route.isPublic && (request.Metadata.GetString("Token", "") == "") {
 		log.Verbose(_logTag, "(%s) route %s:%s is not public and no authorization token was specified", request.Id, strings.ToLower(request.Type.String()), request.Path)

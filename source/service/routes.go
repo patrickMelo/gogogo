@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"gogogo/data"
 	"gogogo/data/contract"
 	"gogogo/log"
 	"gogogo/requests"
@@ -58,18 +59,21 @@ type routeInfo struct {
 }
 
 var (
-	_routes = make(map[string]*routeInfo)
+	_routes = make([]*routeInfo, 0)
 )
 
-func findRoute(requestType requests.Type, path string) *routeInfo {
-	var rawPathParts = strings.Split(path, "/")
-	var pathParts = make([]string, 0, len(rawPathParts))
+func breakPath(path string) []string {
+	var pathParts = strings.Split(path, "/")
 
-	for _, part := range rawPathParts {
-		if part != "" {
-			pathParts = append(pathParts, part)
-		}
+	if strings.HasPrefix(path, "/") {
+		pathParts = pathParts[1:]
 	}
+
+	return pathParts
+}
+
+func findRoute(requestType requests.Type, path string) *routeInfo {
+	var pathParts = breakPath(path)
 
 	if len(pathParts) == 0 {
 		return nil
@@ -126,13 +130,29 @@ func addRoute(requestType requests.Type, path string, isPublic bool, handler req
 
 	log.Verbose(_logTag, "route parts: %v", routeParts)
 
-	_routes[path] = &routeInfo{
+	_routes = append(_routes, &routeInfo{
 		requestType: requestType,
 		isPublic:    isPublic,
 		handler:     handler,
 		parts:       routeParts,
 		contract:    contract,
-	}
+	})
 
 	log.Information(_logTag, "added route for %s:%s [public: %v]", strings.ToLower(requestType.String()), path, isPublic)
+}
+
+func extractRouteData(route *routeInfo, path string) (routeData data.GenericMap) {
+	var pathParts = strings.Split(path, "/")[1:]
+
+	routeData = data.NewGenericMap()
+
+	for index, part := range route.parts {
+		if !part.isVariable {
+			continue
+		}
+
+		routeData.Set(part.part, pathParts[index])
+	}
+
+	return
 }

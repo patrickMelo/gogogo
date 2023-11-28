@@ -15,8 +15,10 @@ func main() {
 
 	config.Load(config.Args(), config.Environment("GGG"), config.File())
 
-	service.AddPublicPush("session/login", SessionLogin, SessionLoginContract)
-	service.AddPrivatePush("session/logout", SessionLogout, nil)
+	service.AddPublicPull("notes", NotesPull, nil)
+	service.AddPublicPush("notes", NotePush, NotePushContract)
+	service.AddPublicPull("notes/:id", NotePull, NotePullContract)
+	service.AddPublicUpdate("notes/:id", NoteUpdate, NoteUpdateContract)
 
 	service.Run()
 }

@@ -1,0 +1,26 @@
+GET http://localhost:8080/notes
+
+POST http://localhost:8080/notes
+Content-Type: application/json
+
+{
+    "name": "Empty Note"
+}
+
+POST http://localhost:8080/notes
+Content-Type: application/json
+
+{
+    "name": "Test Note",
+    "contents": "This is my test note"
+}
+
+GET http://localhost:8080/notes/695156d2-d61e-4e37-86f7-301dbef1fee4
+
+PATCH http://localhost:8080/notes/ce563ae2-4d4d-4bbc-b83b-337181747b1e
+Content-Type: application/json
+
+{
+    "name": "Updated Note",
+    "contents": "This is my updated note"
+}
